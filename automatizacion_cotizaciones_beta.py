@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import Tk, Label, messagebox, Entry, Button, Text, END, filedialog, Frame, Scrollbar, Listbox, MULTIPLE, ttk, PhotoImage
+from tkinter import Tk, Label, messagebox, Entry, Button, Text, END, filedialog, Frame, Scrollbar, Listbox, MULTIPLE, ttk, PhotoImage,Scrollbar,Canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -9,6 +9,8 @@ from reportlab.platypus import Table, TableStyle
 import base64
 from PIL import Image
 from io import BytesIO
+from tkcalendar import Calendar, DateEntry
+
 
 class CotizacionApp:
     def __init__(self, root):
@@ -372,7 +374,7 @@ class CotizacionApp:
         c.drawString(70, 750, "CARPAS GUAJARDO PROD. SPA")
         c.setFont("Times-Roman", 11)
         c.drawString(70, 735, "Rut: 77.011.105-6")
-        c.drawString(70, 720, "Isla Decelt N°8774")
+        c.drawString(70, 720, "Isla Deceit N°8774")
         c.drawString(70, 705, "Pudahuel")
         c.drawString(70, 690, "cel: +569 45121257")
 
