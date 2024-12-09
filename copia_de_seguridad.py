@@ -1,15 +1,19 @@
 import os
-from tkinter import Tk, Label, messagebox, Entry, Button, Text, END, filedialog, Frame, Scrollbar, Listbox, MULTIPLE, ttk
+import tkinter as tk
+from tkinter import Tk, Label, messagebox, Entry, Button, Text, END, filedialog, Frame, Scrollbar, Listbox, MULTIPLE, ttk, PhotoImage
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from datetime import datetime
 from reportlab.platypus import Table, TableStyle
+import base64
+from PIL import Image
+from io import BytesIO
 
 class CotizacionApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Generador de Cotizaciones")
+        self.root.title("Generador de Cotizaciones Carpas Guajardo")
 
         self.descripciones_predefinidas = [
         "Estructura Metálica (3 mts altura parejo)",
@@ -95,8 +99,13 @@ class CotizacionApp:
         self.valor_m2_entry.bind("<KeyRelease>", self.calcular_total_mts)
 
         # Botón Añadir con estilo
-        ttk.Button(self.tabla_frame, text="Añadir", command=self.agregar_detalle).grid(row=2, column=0, columnspan=6, sticky="ew", padx=10, pady=5)
+        ttk.Button(self.tabla_frame, text="Añadir", command=self.agregar_detalle).grid(row=2, column=0, columnspan=3, sticky="ew", padx=10, pady=5)
 
+        # Botón Eliminar con estilo
+        style = ttk.Style()
+        style.configure("Eliminar.TButton", foreground="red", background="red")
+        ttk.Button(self.tabla_frame, text="Eliminar", command=self.eliminar_detalle, style="Eliminar.TButton").grid(row=2, column=3, columnspan=3, sticky="ew", padx=10, pady=5)
+        
         # Listbox para mostrar detalles
         self.tabla_listbox = Listbox(self.tabla_frame, width=80, height=5)
         self.tabla_listbox.grid(row=3, column=0, columnspan=6, sticky="ew", padx=10, pady=5)
@@ -128,6 +137,11 @@ class CotizacionApp:
 
         # Botón Añadir con estilo
         ttk.Button(self.descripcion_frame, text="Añadir", command=self.agregar_descripcion).grid(row=2, column=0, sticky="ew", padx=10, pady=5)
+        
+        # Botón Eliminar con estilo
+        style = ttk.Style()
+        style.configure("Eliminar.TButton", foreground="red", background="red")
+        ttk.Button(self.descripcion_frame, text="Eliminar", command=self.eliminar_descripcion, style="Eliminar.TButton").grid(row=3, column=1, sticky="ew", padx=10, pady=5)
 
         # Listbox para mostrar descripciones
         self.descripcion_listbox = Listbox(self.descripcion_frame, width=60, height=5)
@@ -184,6 +198,38 @@ class CotizacionApp:
             self.descripcion_listbox.insert(END, descripcion)
             self.descripcion_combobox.set("")  # Limpiar selección después de añadir
 
+    def eliminar_detalle(self):
+        # Obtener el índice del detalle seleccionado
+        seleccionado = self.tabla_listbox.curselection()
+        
+        if not seleccionado:
+            messagebox.showerror("Error", "Selecciona un detalle para eliminar")
+            return
+        
+        # Eliminar el detalle de la lista de datos
+        indice = seleccionado[0]
+        self.tabla_datos.pop(indice)
+
+        # Eliminar el detalle de la lista mostrada en el Listbox
+        self.tabla_listbox.delete(indice)
+
+        # Recalcular los totales después de eliminar el detalle
+        self.calcular_totales()
+
+    def eliminar_descripcion(self):
+        # Obtener el índice de la descripción seleccionada
+        seleccionado = self.descripcion_listbox.curselection()
+        
+        if not seleccionado:
+            messagebox.showerror("Error", "Selecciona una descripción para eliminar")
+            return
+        
+        # Eliminar la descripción de la lista de descripciones
+        indice = seleccionado[0]
+        self.descripcion_datos.pop(indice)
+
+        # Eliminar la descripción de la lista mostrada en el Listbox
+        self.descripcion_listbox.delete(indice)
     
     def center_window(self, width, height):
         # Get screen width and height
